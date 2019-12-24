@@ -94,6 +94,9 @@ $clearHashs = openssl_decrypt(
 	base64_decode($response[1]) // aad
 );
 
+echo "\nJSON:\n$clearHashs\n";
+
+
 // Now we have a JSON
 $hashs = json_decode($clearHashs, true);
 // [
