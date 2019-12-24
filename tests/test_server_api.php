@@ -23,7 +23,8 @@ include 'conf.php';
 
 $aesKey64 = base64_encode(random_bytes(32));
 $aesIV64 = base64_encode(random_bytes(16));
-if (!is_file($GNUPGHOME)) {
+
+if (!is_dir($GNUPGHOME)) {
 	mkdir($GNUPGHOME);
 }
 if (!is_file($publicKeyName)) {
@@ -62,6 +63,8 @@ $opts = [
 $context  = stream_context_create($opts);
 $result = file_get_contents($urlPost, false, $context);
 // $result = "<base64 aes-256-gcm response>;<base64 aad>"
+
+echo "Return:\n$result\n";
 
 $response = explode(';', $result);
 
