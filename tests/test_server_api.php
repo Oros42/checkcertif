@@ -14,27 +14,28 @@
  * Source code of the server : https://github.com/Oros42/checkcertif_server
  */
 
-$urlKey = "https://chkcrt-dev.ecirtam.net/public.gpg"; //change me
-$urlPost = "https://chkcrt-dev.ecirtam.net/";  //change me
-$urlToCheck = "https://en.wikipedia.org/";  //change me
-$GNUPGHOME = "./gpg/";
-$publicKeyName = $GNUPGHOME."public.gpg";
+if (!is_file('conf.php')) {
+	copy('conf.php.default', 'conf.php');
+	die("Check that parameters in conf.php are good.\n");
+}
+
+include 'conf.php';
 
 $aesKey64 = base64_encode(random_bytes(32));
 $aesIV64 = base64_encode(random_bytes(16));
 if (!is_file($GNUPGHOME)) {
-    mkdir($GNUPGHOME);
+	mkdir($GNUPGHOME);
 }
 if (!is_file($publicKeyName)) {
-    file_put_contents($publicKeyName, file_get_contents($urlKey));
+	file_put_contents($publicKeyName, file_get_contents($urlKey));
 }
 
 // JSON with your request
 $msgArray = [
-    "pwd" => $aesKey64,
-    "i" => $aesIV64,
-    "url" => $urlToCheck,
-    "v" => "0.7"
+	"pwd" => $aesKey64,
+	"i" => $aesIV64,
+	"url" => $urlToCheck,
+	"v" => "0.7"
 ];
 $msgJSON = json_encode($msgArray);
 
@@ -48,15 +49,15 @@ $msgEnc = $gpg->encrypt($msgJSON);
 // and we post this to the server
 $boundary = uniqid();
 $postdata = "-----------------------------".$boundary."\r\n"
-    ."Content-Disposition: form-data; name=\"m\"\r\n\r\n"
-    .$msgEnc."\r\n"
-    ."-----------------------------".$boundary."--\r\n";
+	."Content-Disposition: form-data; name=\"m\"\r\n\r\n"
+	.$msgEnc."\r\n"
+	."-----------------------------".$boundary."--\r\n";
 $opts = [
-    'http' =>[
-        'method'  => 'POST',
-        'header'  => 'Content-Type: multipart/form-data; boundary=---------------------------'.$boundary,
-        'content' => $postdata
-    ]
+	'http' =>[
+		'method'  => 'POST',
+		'header'  => 'Content-Type: multipart/form-data; boundary=---------------------------'.$boundary,
+		'content' => $postdata
+	]
 ];
 $context  = stream_context_create($opts);
 $result = file_get_contents($urlPost, false, $context);
@@ -66,12 +67,12 @@ $response = explode(';', $result);
 
 // we decrypt the AES
 $clearHashs = openssl_decrypt(
-    base64_decode($response[0]), // encrypted string
-    'aes-256-gcm',
-    base64_decode($aesKey64),
-    OPENSSL_RAW_DATA,
-    base64_decode($aesIV64),
-    base64_decode($response[1]) // aad
+	base64_decode($response[0]), // encrypted string
+	'aes-256-gcm',
+	base64_decode($aesKey64),
+	OPENSSL_RAW_DATA,
+	base64_decode($aesIV64),
+	base64_decode($response[1]) // aad
 );
 
 // Now we have a JSON

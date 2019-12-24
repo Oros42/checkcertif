@@ -1,0 +1,6 @@
+<?php
+$urlKey = "https://chkcrt-dev.ecirtam.net/public.gpg"; //change me
+$urlPost = "https://chkcrt-dev.ecirtam.net/";  //change me
+$urlToCheck = "https://en.wikipedia.org/";  //change me
+$GNUPGHOME = "./gpg/";
+$publicKeyName = $GNUPGHOME."public.gpg";
