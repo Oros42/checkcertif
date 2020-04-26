@@ -16,3 +16,18 @@ The project is split in 2 parts.
   
 ## Tests
 [Run tests](./tests/README.md)
+
+## TODO
+### addon
+- catch error and display message
+- CSS
+- ergonomics
+- detection of CDN
+- i18n
+- white list and black list of URL to check
+- fix no response « … » (wait)
+- posibility to change the domains.js
+
+### server
+- simplify the install
+- new repo for optionnal install with docker
